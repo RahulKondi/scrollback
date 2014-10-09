@@ -92,39 +92,41 @@ function toastChange(state, next) {
 }
 
 module.exports = function (libsb) {
-	$(function () {
-		// Handle fullview button click
-		$(".embed-action-fullview").on("click", function () {
-			window.open((window.location.href).replace(/[&,?]embed=[^&,?]+/g, ""), "_blank");
-		});
-
-		// Handle minimize
-		$(".embed-action-minimize").on("click", function () {
-			libsb.emit("navigate", {
-				minimize: true,
-				source: "embed",
-				event: "action-minimize"
+	if(window.parent !== window) {
+		$(function () {
+			// Handle fullview button click
+			$(".embed-action-fullview").on("click", function () {
+				window.open((window.location.href).replace(/[&,?]embed=[^&,?]+/g, ""), "_blank");
 			});
-		});
 
-		$(".title-bar").on("click", function (e) {
-			if (e.target === e.currentTarget) {
+			// Handle minimize
+			$(".embed-action-minimize").on("click", function () {
 				libsb.emit("navigate", {
 					minimize: true,
 					source: "embed",
-					event: "title-bar"
+					event: "action-minimize"
 				});
-			}
-		});
-
-		$(".minimize-bar").on("click", function () {
-			libsb.emit("navigate", {
-				minimize: false,
-				source: "embed",
-				event: "minimize-bar"
 			});
-		});
-	});
+
+			$(".title-bar").on("click", function (e) {
+				if (e.target === e.currentTarget) {
+					libsb.emit("navigate", {
+						minimize: true,
+						source: "embed",
+						event: "title-bar"
+					});
+				}
+			});
+
+			$(".minimize-bar").on("click", function () {
+				libsb.emit("navigate", {
+					minimize: false,
+					source: "embed",
+					event: "minimize-bar"
+				});
+			});
+		});	
+	}
 
 	var url = parseURL(window.location.pathname, window.location.search);
 	embed = url.embed;
@@ -171,7 +173,6 @@ module.exports = function (libsb) {
 	libsb.on("navigate", function (state, next) {
 		function processNavigate() {
 			var guides;
-//				console.log("DATA:", {booted: libsb.hasBooted, verificationStatus: verificationStatus,verificationTimeout: verificationTimeout, verified: verified, domain: domain, path: path, state: state});
 			if (state.source == "boot") {
 				bootingDone = true;
 				state.embed = embed;
